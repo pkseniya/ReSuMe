@@ -81,7 +81,6 @@ def precision_calc(tfl_l_hat, tfd_l):
    spike in tl_f. Finally this function
    returns a list of pairs (td,(f),∆t(f))
 '''
-    # Calculate the time difference between td and the nearest spike in tl_f
 def error(tfl_l_hat, tfd_l):
   e = []
   for td in tfd_l:
