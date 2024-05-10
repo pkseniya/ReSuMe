@@ -239,14 +239,3 @@ W = get_W(C_ee, C_ei, C_ie, C_ii, neur_ei, 10)
 V, spikes = LIF_network(N,dt,tmax,p,W,I0,S_in, neur_ei, 10000)
 
 raster_plot(spikes,t)
-
-plt.plot(t, S_in)
-
-plt.plot(t,V[:,2])
-plt.plot(t,V[:,20], alpha=0.4)
-plt.ylim(ymin=13.4)
-plt.plot(t, S_in*15)
-
-spikes[:,1]
-
-W
