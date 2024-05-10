@@ -16,6 +16,7 @@ def poisson_generator(N, dt, nt, rate):
     This function generates Poisson binary spike trains.
 
     Args:
+        pars (dict): dictionary with model parameters
         dt (float): time step
         nt (int): number of time steps
         rate (float): rate of firing
@@ -32,6 +33,42 @@ def poisson_generator(N, dt, nt, rate):
 
     return poisson_train
 
+def poisson_generator_long(N, dt, nt, rate, len):
+    """
+    This function generates Poisson binary spike trains.
+
+    Args:
+        pars (dict): dictionary with model parameters
+        dt (float): time step
+        nt (int): number of time steps
+        rate (float): rate of firing
+
+    Returns:
+       poisson_train: ndarray of generated Poisson binary spike trains (N x number of times steps)
+    """
+
+    # generate uniformly distributed random variables
+    u_rand = np.random.rand(N,nt)
+
+    # generate Poisson train
+    poisson_train = np.int8(1.*(u_rand < rate*dt/1000.0))[0]
+    k=0
+    print(k,nt)
+    while(k<nt):
+      print('a')
+      if(poisson_train[k]):
+        poisson_train[k:k+len]=1
+        print('found 1')
+        k+=len
+      else:
+        k+=1
+        print('found 0')
+    return poisson_train
+
+a=np.zeros(10)
+a[5:8]=1
+a
+
 dt=0.1
 tmax=400
 nt=int(tmax/dt)+1
@@ -40,6 +77,12 @@ t = np.linspace(0.0, tmax, nt)
 S_in=poisson_generator(1, dt, nt, rate).reshape(t.shape)
 
 plt.plot(t, S_in)
+
+S_in2 = poisson_generator_long(1, dt, nt, rate, 10)
+
+plt.plot(S_in2[500:1000])
+
+print(S_in2)
 
 """LIF network"""
 
@@ -149,13 +192,13 @@ def LIF_network(N,dt,tmax,p,W,I0,S_in, neur_ei, D):
           spikes[it+1,ifired] += 1.0
           # update refractory counter for all fired neurons
           for g in ifired[0]:
-            #print(ifired)
+
             if(counter[g,1]):
               counter[g,0] += int(p['t_r_e']/dt)
             else:
               counter[g,0] += int(p['t_r_i']/dt)
 
-            #print(counter[g,0])
+
     print()
     return V, spikes
 
@@ -195,7 +238,7 @@ def get_W(C_ee, C_ei, C_ie, C_ii, neur_ei, weight):
       dist=D(distmat[a], distmat[b])
       prob[a,b]=probability(C, dist)
 
-  W = weight*(np.random.random(size=(N,N))>prob)
+  W = weight*(np.random.random(size=(N,N))<prob)
   #W=weight*prob
   return W
 
@@ -233,8 +276,24 @@ def raster_plot(spikes,t):
 
 p['R'] = 1
 
-W = get_W(C_ee, C_ei, C_ie, C_ii, neur_ei, 10)
+W = get_W(C_ee, C_ei, C_ie, C_ii, neur_ei, 1)
 
-V, spikes = LIF_network(N,dt,tmax,p,W,I0,S_in, neur_ei, 10000)
+V, spikes = LIF_network(N,dt,tmax,p,W,I0,S_in2, neur_ei, 20)
 
 raster_plot(spikes,t)
+
+plt.plot(t, S_in)
+
+A = np.mean(spikes, axis = 1)
+plt.plot(t,A)
+plt.xlim(380,400)
+
+plt.plot(t,V[:,2])
+plt.plot(t,V[:,-1])
+plt.ylim(ymin=13.4)
+plt.plot(t, S_in*15)
+plt.xlim(0,50)
+
+spikes[:,1]
+
+len(np.where(W>0)[0])
