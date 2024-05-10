@@ -16,7 +16,6 @@ def poisson_generator(N, dt, nt, rate):
     This function generates Poisson binary spike trains.
 
     Args:
-        pars (dict): dictionary with model parameters
         dt (float): time step
         nt (int): number of time steps
         rate (float): rate of firing
