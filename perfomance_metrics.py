@@ -27,7 +27,7 @@ def extract_tf(S):
   return np.array(impulse_time_moments)
 
 # Performance index
-'''here the mein function is Pm with args
+'''here the main function is Pm with args
    tfl_l, tfd_l, t_l: t_l is list/array
    of every time step from zero 400 ms;
    tfl_l and tfl_d are lists/arrays of
