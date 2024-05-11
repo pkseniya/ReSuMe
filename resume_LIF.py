@@ -77,7 +77,7 @@ C_ei=0.2
 C_ie=0.4
 C_ii=0.1
 
-def LIF_network(N,dt,tmax,p,W,I0,S_in, neur_ei, D):
+def LIF_network(N,dt,tmax,p,W,I0,S_in, neur_ei, D_ex, D_in):
     """
     This function implements a simple network of LIF neurons
 
@@ -88,7 +88,7 @@ def LIF_network(N,dt,tmax,p,W,I0,S_in, neur_ei, D):
         p (dict): parameters of the LIF model
         W (numpy ndarray): matrix of the synaptic weights
         I0 (float): injected current
-        D (float, optional): amplitude of stochastic current
+        D_ex, D_in (float): amplitudes of stochastic current for exc. and inh. neurons
         S_in - input signal (sequence of 0 and 1)
     Returns:
         V, spikes: calculated membrane potentials and binary spike trains
@@ -99,6 +99,11 @@ def LIF_network(N,dt,tmax,p,W,I0,S_in, neur_ei, D):
     nt = int(tmax/dt) + 1
     spikes = np.zeros((nt,N+1)) # binary spike train
     V = np.zeros((nt,N)) # membrane potentials
+
+    D = np.zeros((N+1,1))
+    D[neur_ei==1] = D_ex
+    D[neur_ei==0] = D_in
+    D[-1]=0
 
     # parameters of the LIF model
     tau = p['tau']
@@ -246,9 +251,11 @@ def raster_plot(spikes,t):
 
     plt.show()
 
-W = get_W(N, C_ee, C_ei, C_ie, C_ii, neur_ei, 0.5)
+Weight = 0.5
+W = get_W(N, C_ee, C_ei, C_ie, C_ii, neur_ei, Weight)
 
-Stochastic_current_amplitude=5
-V, spikes = LIF_network(N,dt,tmax,p,W,I0,S_in, neur_ei, Stochastic_current_amplitude)
+Stochastic_current_amplitude_ex=5.
+Stochastic_current_amplitude_in=3.
+V, spikes = LIF_network(N,dt,tmax,p,W,I0,S_in, neur_ei, Stochastic_current_amplitude_ex, Stochastic_current_amplitude_in)
 
 raster_plot(spikes,t)
