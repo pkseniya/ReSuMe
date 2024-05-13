@@ -10,21 +10,7 @@ Original file is located at
 import numpy as np
 
 def extract_tf(S):
-  # Length of the signal array
-  signal_length = len(S)
-
-  # Time duration of each time step
-  time_step_duration = 400 / signal_length  # Assuming the signal lasts for 400 ms
-
-  # Initialize an empty list to store time moments where impulses exist
-  impulse_time_moments = []
-
-  for i in range(signal_length):
-    if S[i] == 1:
-        time_moment = i * time_step_duration
-        impulse_time_moments.append(time_moment)
-
-  return np.array(impulse_time_moments)
+    return np.where(S == 1)[0]
 
 # Performance index
 '''here the main function is Pm with args
