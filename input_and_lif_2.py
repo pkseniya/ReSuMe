@@ -44,7 +44,6 @@ def LIF_network(N,dt,tmax,p,W,I0,S_in, neur_ei):
         p (dict): parameters of the LIF model
         W (numpy ndarray): matrix of the synaptic weights
         I0 (float): injected current
-        D_ex, D_in (float): amplitudes of stochastic current for exc. and inh. neurons
         S_in - input signal (sequence of 0 and 1)
     Returns:
         V, spikes: calculated membrane potentials and binary spike trains
