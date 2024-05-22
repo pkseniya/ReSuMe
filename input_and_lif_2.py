@@ -33,7 +33,7 @@ def generator(N, dt, nt, rate):
 
     return train
 
-def LIF_network(N,dt,tmax,p,W,I0,S_in, neur_ei, D_ex, D_in):
+def LIF_network(N,dt,tmax,p,W,I0,S_in, neur_ei):
     """
     This function implements a simple network of LIF neurons
 
@@ -56,11 +56,6 @@ def LIF_network(N,dt,tmax,p,W,I0,S_in, neur_ei, D_ex, D_in):
     spikes = np.zeros((nt,N+1)) # binary spike train
     V = np.zeros((nt,N)) # membrane potentials
 
-    D = np.zeros((N+1,1))
-    D[neur_ei==1] = D_ex
-    D[neur_ei==0] = D_in
-    D[-1]=0
-
     # parameters of the LIF model
     tau = p['tau']
 
@@ -75,7 +70,7 @@ def LIF_network(N,dt,tmax,p,W,I0,S_in, neur_ei, D_ex, D_in):
     for it in tqdm(range(nt-1)):
 
         # generate the external current
-        I_ext = I0 + D*np.random.normal(size=(N+1,1))
+        I_ext = I0
         # calculate the synaptic current
         I_syn = W @ spikes[it,:].reshape([N+1,1])
         # get the total current
