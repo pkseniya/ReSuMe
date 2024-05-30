@@ -1,7 +1,8 @@
 import numpy as np
 
 class Learner:
-    def __init__(self,A_d=1, A_l=1, tau_d=1, tau_l=1, a_d=0, a_l=0):
+    def __init__(self, inh_inds, A_d=1, A_l=1, tau_d=1, tau_l=1, a_d=0.1, a_l=-0.1): # A_d=0.8, A_l=0.25, tau_d=0.7, tau_l=1, a_d=0.5, a_l=-0.5
+        self.inh_inds = inh_inds
         self.A_d = A_d
         self.A_l = A_l
         self.tau_d = tau_d
@@ -13,27 +14,22 @@ class Learner:
         return np.where(s_d > 0, self.A_d * np.exp(-s_d / self.tau_d), 0)
 
     def W_l(self, s_l):
-        return np.where(s_l > 0, - self.A_l * np.exp(-s_l / self.tau_l), 0)
+        return np.where(s_l > 0, -self.A_l * np.exp(-s_l / self.tau_l), 0)
 
-
-    def update(self, t, S_l, S_d, S_in, dt=1):
+    def update(self, t, S_l_i, S_d_i, S_in, dt=1):
         # S_l [num_ts], S_d [num_ts], S_in [num_neurons, num_ts]
 
-        num_neurons, num_ts = S_in.shape
-        time_id = int(t / dt)
-
         dws = []
-        for neuron in range(num_neurons):
-            dw_d = dw_l = 0
+        num_neurons, num_ts = S_in.shape
 
-            for j in range(len(S_d)):
-                s_d = t - 0.001 * dt * j
-                dw_d += self.W_d(s_d) * S_in[neuron, j]
-            
-            for j in range(len(S_l)):
-                s_l = t - 0.001 * dt * j
-                dw_l += self.W_l(s_l) * S_in[neuron, j]
+        times = np.repeat(np.arange(401).reshape(1, -1), num_neurons, axis=0)
 
-            dws.append(S_d[time_id] * (self.a_d + dw_d) + S_l[time_id] * (self.a_l + dw_l))
+        dw_d = np.where(S_in, self.W_d(-times + t), 0).sum(1)
+        dw_l = np.where(S_in, self.W_l(-times + t), 0).sum(1)
 
-        return dws
+        mul = np.ones((num_neurons, ))
+        mul[self.inh_inds] = -1
+
+        dw = mul * (S_d_i * (self.a_d + dw_d) + S_l_i * (self.a_l + dw_l))
+
+        return dw.reshape(-1, 1)
